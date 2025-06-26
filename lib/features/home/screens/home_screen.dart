@@ -3,6 +3,11 @@ import 'package:hive/hive.dart';
 import 'package:numberfactapp/core/models/saved_facts.dart';
 import 'package:numberfactapp/core/service/fact_service.dart';
 import 'package:numberfactapp/features/home/screens/saved_facts.dart';
+import 'package:numberfactapp/features/home/widgets/fact_type_dropdown.dart';
+import 'package:numberfactapp/features/home/widgets/date_input_row.dart';
+import 'package:numberfactapp/features/home/widgets/number_input_field.dart';
+import 'package:numberfactapp/features/home/widgets/random_switch_tile.dart';
+import 'package:numberfactapp/features/home/widgets/submit_button.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -162,96 +167,42 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: const EdgeInsets.all(16),
                 child: ListView(
                   children: [
-                    DropdownButtonFormField<String>(
-                      value: _selectedType,
-                      items: const [
-                        DropdownMenuItem(
-                          value: 'trivia',
-                          child: Text('Trivia'),
-                        ),
-                        DropdownMenuItem(value: 'math', child: Text('Math')),
-                        DropdownMenuItem(value: 'date', child: Text('Date')),
-                      ],
+                    FactTypeDropdown(
+                      selectedType: _selectedType,
                       onChanged: (val) {
                         setState(() {
-                          _selectedType = val!;
+                          _selectedType = val;
                           _controller.clear();
                           _selectedMonth = null;
                           _selectedDay = null;
                         });
                       },
-                      decoration: const InputDecoration(labelText: 'Fakt turi'),
                     ),
                     const SizedBox(height: 16),
-
-                    if (_selectedType == 'date') ...[
-                      Row(
-                        children: [
-                          Expanded(
-                            child: DropdownButtonFormField<int>(
-                              value: _selectedMonth,
-                              items: List.generate(12, (i) {
-                                return DropdownMenuItem(
-                                  value: i + 1,
-                                  child: Text(months[i]),
-                                );
-                              }),
-                              onChanged: (val) =>
-                                  setState(() => _selectedMonth = val),
-                              decoration: const InputDecoration(
-                                labelText: 'Oy',
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: DropdownButtonFormField<int>(
-                              value: _selectedDay,
-                              items: List.generate(31, (i) {
-                                return DropdownMenuItem(
-                                  value: i + 1,
-                                  child: Text('${i + 1}'),
-                                );
-                              }),
-                              onChanged: (val) =>
-                                  setState(() => _selectedDay = val),
-                              decoration: const InputDecoration(
-                                labelText: 'Kun',
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ] else
-                      TextField(
+                    if (_selectedType == 'date')
+                      DateInputRow(
+                        selectedMonth: _selectedMonth,
+                        selectedDay: _selectedDay,
+                        months: months,
+                        onMonthChanged: (val) =>
+                            setState(() => _selectedMonth = val),
+                        onDayChanged: (val) =>
+                            setState(() => _selectedDay = val),
+                      )
+                    else
+                      NumberInputField(
                         controller: _controller,
                         enabled: !_isRandom,
-                        keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(labelText: 'Raqam'),
                       ),
-
                     const SizedBox(height: 16),
-
-                    SwitchListTile(
-                      title: const Text('Tasodifiy'),
+                    RandomSwitchTile(
                       value: _isRandom,
                       onChanged: (val) => setState(() => _isRandom = val),
                     ),
-
                     const SizedBox(height: 24),
-
-                    ElevatedButton.icon(
-                      icon: const Icon(Icons.search),
-                      label: const Text('Faktni olish'),
+                    SubmitButton(
+                      isLoading: _isLoading,
                       onPressed: _isLoading ? null : _getFact,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Theme.of(context).colorScheme.primary,
-                        foregroundColor: Colors.white,
-                        minimumSize: const Size(double.infinity, 50),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
                     ),
                   ],
                 ),
@@ -259,7 +210,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
         ),
-
         if (_isLoading)
           ModalBarrier(
             dismissible: false,

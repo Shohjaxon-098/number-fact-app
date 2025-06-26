@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:numberfactapp/core/models/saved_facts.dart';
+import 'package:numberfactapp/features/home/widgets/empty_placeholder.dart';
+import 'package:numberfactapp/features/home/widgets/saved_fact_card.dart';
 
 class SavedFactsScreen extends StatelessWidget {
   const SavedFactsScreen({super.key});
@@ -13,7 +15,6 @@ class SavedFactsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final box = Hive.box<SavedFact>('savedFacts');
-    final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar: AppBar(
@@ -54,20 +55,7 @@ class SavedFactsScreen extends StatelessWidget {
         valueListenable: box.listenable(),
         builder: (context, box, _) {
           if (box.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.inbox, size: 72, color: colorScheme.outline),
-                  const SizedBox(height: 12),
-                  Text(
-                    'Hozircha hech qanday fakt saqlanmagan.',
-                    style: TextStyle(fontSize: 16, color: colorScheme.outline),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            );
+            return const EmptyPlaceholder();
           }
 
           return ListView.separated(
@@ -76,42 +64,10 @@ class SavedFactsScreen extends StatelessWidget {
             separatorBuilder: (_, __) => const SizedBox(height: 12),
             itemBuilder: (context, index) {
               final fact = box.getAt(index)!;
-              return Card(
-                elevation: 4,
-                shadowColor: colorScheme.shadow.withOpacity(0.3),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: ListTile(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 14,
-                  ),
-                  title: Text(
-                    fact.fact,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: colorScheme.onSurface,
-                    ),
-                  ),
-                  subtitle: Text(
-                    '${fact.type.toUpperCase()} • ${_formatDate(fact.savedAt)}',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: colorScheme.onSurface.withOpacity(0.7),
-                    ),
-                  ),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.delete),
-                    color: Colors.red,
-                    tooltip: 'O‘chirish',
-                    onPressed: () => box.deleteAt(index),
-                  ),
-                ),
+              return SavedFactCard(
+                fact: fact,
+                formattedDate: _formatDate(fact.savedAt),
+                onDelete: () => box.deleteAt(index),
               );
             },
           );
