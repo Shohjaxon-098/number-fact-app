@@ -24,8 +24,6 @@ Flutter asosidagi ilova bo‘lib, foydalanuvchiga **raqamlar**, **matematik**, *
 |------------|-------------|---------------|
 | ![main](image-4.png) | ![dialog](image-3.png) | ![saved](image-1.png) |
 
-🎞️ Video: [YouTube Demo](https://youtu.be/your-demo-link)
-
 ---
 
 ## 🛠 Texnologiyalar
